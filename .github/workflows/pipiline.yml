@@ -8,7 +8,7 @@ on:
   pull_request:
     branches: [ "main" ]
 
-#étape 2 : Quoi ? (Les missions)
+#étape 2: Quoi ? (Les missions)
 jobs:
   security-and-quality:
     name: Audit & Test
@@ -32,7 +32,7 @@ jobs:
           pip install -r requirements.txt
 
       #D. Sécurité (Gatekeeper)
-      #Si ça échoue ici, la pipeline s'arrêt et on reçoit une alerte
+      #Si ça échoue ici, la pipeline s'arrêt et on reçoit une alerte.
       - name: Security Audit (Pip-Audit)
         run: pip-audit
 
@@ -40,3 +40,18 @@ jobs:
       #Le robot lance le test qu'on vient de réussir en local.
       - name: Run unit Tests (Pytest)
         run: pytest
+      
+  #étape: 3 Construction Docker
+  docker-build:
+    name: Build Check
+    needs: [security-and-quality] #On attent que le job est fait .
+    runs-on: ubuntu-latest
+
+    steps: 
+      #A. On récupère le code. Chaque job est un serveur vierge, il ne partage rien.
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      #B. On build l'image
+      - name: Build Docker Image
+        run: docker build -t sentinel-api .
