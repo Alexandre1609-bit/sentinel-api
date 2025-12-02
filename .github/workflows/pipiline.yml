@@ -1,0 +1,42 @@
+name: Sentinel CI
+
+#étape 1: Quand ? (les déclancheurs)
+#Le robot se réveille quand on pousse sur "main" ou qu'on fait une Pull Request !
+on:
+  push:
+    branches: [ "main" ] # C'est assez explicite en vrai !
+  pull_request:
+    branches: [ "main" ]
+
+#étape 2 : Quoi ? (Les missions)
+jobs:
+  security-and-quality:
+    name: Audit & Test
+    runs-on: ubuntu-latest #Ici github nous prête un serveur Linux, pas mal ! 
+
+    steps:
+      #A. Le robot récupère le code
+      - name: Checkout code
+        uses: actions/checkout@v4 #'@v4' : Sécurité de la chaîne de d'approvisionnement. On reste sur la v4, figée et sécurisée.
+
+      #B. Le robot installe Python 3.10
+      - name: Set up Python 3.10
+        uses: action.setup-python@v4
+        with:
+          python-version: "3.10"
+      
+      #C. Le robot installe les outils (pytest, httpx, pip-audit...)
+      - name: Install dépendencies
+        run: | #(Pipe) Permet de faire un bloc de texte sur plusieurs lignes ! Sans '|' obligé de faire sur une ligne avec '&&'.
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      #D. Sécurité (Gatekeeper)
+      #Si ça échoue ici, la pipeline s'arrêt et on reçoit une alerte
+      - name: Security Audit (Pip-Audit)
+        run: pip-audit
+
+      #E. Qualité
+      #Le robot lance le test qu'on vient de réussir en local.
+      - name: Run unit Tests (Pytest)
+        run: pytest

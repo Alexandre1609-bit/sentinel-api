@@ -2,7 +2,7 @@
 FROM python:3.10-slim
 
 # Le dossier de travail
-# On crée TOUT DE SUITE. Docker crée le dossier /code (en tant que Root!!!!!!!!!!).
+# # Exécuté en tant que Root pour les permissions d'écriture.
 WORKDIR /code
 
 # Installation des dépendances (En tant que Root!!!)
@@ -11,7 +11,7 @@ COPY ./requirements.txt /code/requirements.txt
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
 # Copie du code (En tant que Root!)
-COPY ./app /code/app
+COPY ./app /code/app/
 
 # Création de l'utilisateur (Sécurité)
 # On prépare l'identité du locataire.
@@ -28,4 +28,4 @@ USER sentineluser
 
 # Lancement
 # C'est sentineluser qui lance la commande.
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
