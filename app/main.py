@@ -1,12 +1,14 @@
 from fastapi import FastAPI
-from typing import Dict # On importe le type "Dictionnaire"
+from app.config import settings
 
 app = FastAPI()
 
 @app.get("/status")
-def read_status() -> Dict[str, str]:
-    """
-    Vérifie l'état de santé de l'API.
-    Retourne un JSON indiquant si le système est opérationnel.
-    """
-    return {"status": "OK", "system": "Sentinel-API Ready"}
+def read_status():
+    #On utilise les variable chargées
+    return {
+        "status": "OK",
+        "system": settings.app_name,
+        "version": settings.app_version,
+        "contact": settings.admin_email
+    }

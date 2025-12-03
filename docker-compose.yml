@@ -1,0 +1,31 @@
+
+services:
+#Nom du service (interne au réseau Docker)
+  sentinel-api:
+    #Au lieu de dire "utilise telle image", on dit "Construit ce qu'il y a ici"
+    build: . #Remplace la commande "docker build -t...", "docker-compose up -d --build" va construire l'image tout seul s'il ne la trouve pas
+
+    #Le nom propre du contenuer (pour les commandes docker logs par exemple...)
+    container_name: sentinel-container
+
+    #Mapping de ports (Rappel : PC:Conteneur)
+    ports: #Remplace le -p 8080:8080
+      - "8080:8080"
+
+    environment:
+      - APP_NAME=${APP_NAME}
+      - APP_VERSION=${APP_VERSION}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+    
+    #On définit les ressources limites.
+    #Pour éviter que le conteneur mange 100% du CPU en cas de boucle infinie.
+    #C'est une bonne pratique de le faire donc à ne pas oublier !
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5' #Max 50% d'un coeur CPU
+          memory: 512M #Max 512 Mo de RAM
+    
+    #Politique de redémarrage
+    #Si l'app plante, Docker essaie de la relancer (Sauf si on l'a stoppée nous-même)
+    restart: unless-stopped
