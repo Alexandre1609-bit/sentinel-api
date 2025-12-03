@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
 from app.main import app
+from app.config import settings
 
 #On crée le simulateur
 client = TestClient(app)
@@ -18,5 +19,10 @@ def test_read_status_return_200():
     #On vérifie que le serveur n'a pas planté (Rappel : code 200 = OK)
     assert response.status_code == 200 #Si le code = 200, le code continue, sinon (500, 404...) le code s'arrête.
 
-    except_json = {"status": "OK", "system": "Sentinel-API Ready"}
+    except_json = {
+        "status": "OK",
+        "system": settings.app_name,
+        "version": settings.app_version,
+        "contact": settings.admin_email
+    }
     assert response.json() == except_json
