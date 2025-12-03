@@ -39,6 +39,9 @@ jobs:
       #E. Qualité
       #Le robot lance le test qu'on vient de réussir en local.
       - name: Run unit Tests (Pytest)
+        env:
+          ADMIN_EMAIL: "robot@test.ci"
+          APP_NAME: "Sentinel-CI"
         run: pytest
       
   #étape: 3 Construction Docker
