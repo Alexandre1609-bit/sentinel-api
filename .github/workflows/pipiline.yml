@@ -44,17 +44,44 @@ jobs:
           APP_NAME: "Sentinel-CI"
         run: pytest
       
-  #étape: 3 Construction Docker
-  docker-build:
-    name: Build Check
-    needs: [security-and-quality] #On attent que le job est fait .
+  #étape: 3 Construction et livraison (CD)
+  docker-build-and-push:
+    needs: [security-and-quality]
     runs-on: ubuntu-latest
 
-    steps: 
-      #A. On récupère le code. Chaque job est un serveur vierge, il ne partage rien.
+    #1. Permissions (sécurité !)
+    #On donne le droit au robot d'écrire des "packages" (images)
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      #B. On build l'image
-      - name: Build Docker Image
-        run: docker build -t sentinel-api .
+      #2. On se connecte au registre
+      #Le robot utilise sa carte d'identité temporaire pour entrer
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      #3. On prépare les métadonnées
+      #Cette action calcule automatiquement les noms et les tags de l'image
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5 #Ici ça génère automatiquement le tag ":main" (on est sur la branche main)
+        with:
+          images: ghcr.io/${{ github.repository }}
+
+      #4. Build & Push
+      #L'action "officielle" qui construit ET envoie l'image !
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true #On active le CD !! 
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

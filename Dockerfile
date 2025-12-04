@@ -2,7 +2,7 @@
 FROM python:3.10-slim
 
 # Le dossier de travail
-# # Exécuté en tant que Root pour les permissions d'écriture.
+#Exécuté en tant que Root pour les permissions d'écriture.
 WORKDIR /code
 
 # Installation des dépendances (En tant que Root!!!)
