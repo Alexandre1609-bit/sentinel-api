@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # Sentinel-API
 
 Sentinel-API est une API REST minimaliste conçue comme un laboratoire d'apprentissage autour des pratiques DevOps, du Clean Code et des standards de développement modernes.
