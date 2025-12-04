@@ -5,6 +5,7 @@ name: Sentinel CI
 on:
   push:
     branches: [ "main" ] # C'est assez explicite en vrai !
+    tags: ["v*.*.*"]
   pull_request:
     branches: [ "main" ]
 
